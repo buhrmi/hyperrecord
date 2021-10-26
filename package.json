@@ -1,0 +1,16 @@
+{
+  "name": "hyperrecord",
+  "browser": "dist/hyperrecord.umd.js",
+  "module": "dist/hyperrecord.esm.js",
+  "main": "dist/hyperrecord.cjs.js",
+
+  "devDependencies": {
+    "jasmine": "^3.10.0",
+    "rollup": "^2.58.3"
+  },
+  "scripts": {
+    "test": "jasmine",
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
+  }
+}
