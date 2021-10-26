@@ -1,4 +1,4 @@
-export default class Base {
+export default class {
   
   // Returns a new model class with the purpose of being augmented by Opal/Ruby2JS/etc
   static make(modelName) {
