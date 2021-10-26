@@ -14,9 +14,18 @@ const User = Model.make('User')
 const user = await User.create({name: 'John Doe'})
 
 // Subscribe to changes
-user.subscribe(function(attrs) {
+const unsubscribe = user.subscribe(function(attrs) {
   console.log(attrs.name)
 })
+
+// Make changes
+user.set({name: 'Jane Doe'})
+
+// Save them
+user.save()
+
+// Unsubscribe
+unsubscribe()
 ```
 
 ## Testing

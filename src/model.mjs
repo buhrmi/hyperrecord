@@ -6,6 +6,7 @@ export default class {
       static name = modelName;
       constructor(attrs) {
         super();
+        this._subscribers = [];
         this.attrs = attrs;
       }
     }
@@ -35,13 +36,17 @@ export default class {
   
   subscribe(callback) {
     callback(this.attrs)
-    return function() {
-      // TODO: Unsubscribe
+    this._subscribers.push(callback);
+    return () => {
+      // Unsubscribe
+      this._subscribers = this._subscribers.filter(subscriber => subscriber !== callback);
     }
   }
 
-  set() {
-    // TODO
+  set(newAttrs) {
+    // TODO: might be unexpected to merge the new attrs into the existing attrs instead of replacing them
+    this.attrs = {...this.attrs, ...newAttrs};
+    this._subscribers.forEach(subscriber => subscriber(this.attrs));
   }
 
 }

@@ -24,4 +24,26 @@ describe("A record", function() {
     user.subscribe(spy)
     expect(spy).toHaveBeenCalledWith({ name: "John Doe" })
   })
+
+  it("triggers subscriptions when set is called", async function() {
+    const User = Model.make("User")
+    const user = await User.create({ name: "John Doe" })
+    const spy = jasmine.createSpy('subscription')
+    user.subscribe(spy)
+    expect(spy).toHaveBeenCalledWith({ name: "John Doe" })
+
+    user.set({ name: "Jane Doe" })
+    expect(spy).toHaveBeenCalledWith({ name: "Jane Doe" })
+  })
+
+  it("can be unsubscribed from", async function() {
+    const User = Model.make("User")
+    const user = await User.create({ name: "John Doe" })
+    const spy = jasmine.createSpy('subscription')
+    const unsubscribe = user.subscribe(spy)
+    expect(spy).toHaveBeenCalledWith({ name: "John Doe" })
+    unsubscribe()
+    user.set({ name: "Jane Doe" })
+    expect(spy).toHaveBeenCalledWith({ name: "John Doe" })
+  })
 })
