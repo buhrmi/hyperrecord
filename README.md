@@ -1,5 +1,7 @@
 # HyperRecord
 
+[![<HyperRecord>](https://circleci.com/gh/buhrmi/hyperrecord.svg?style=shield)](https://app.circleci.com/pipelines/github/buhrmi/hyperrecord)
+
 Frontend-agnostic client-side adapter for [HyperModel](https://docs.hyperstack.org/hyper-model)
 
 ## Usage
