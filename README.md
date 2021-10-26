@@ -24,7 +24,7 @@ const unsubscribe = user.subscribe(function(attrs) {
 user.set({name: 'Jane Doe'})
 
 // Save them
-user.save()
+await user.save()
 
 // Unsubscribe
 unsubscribe()
