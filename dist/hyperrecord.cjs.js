@@ -1,4 +1,24 @@
-import db from './db.mjs'
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+const db = new Promise(function(resolve, reject) {
+  const request = indexedDB.open('hyperrecord', 1);
+  request.onupgradeneeded = function(event) {
+    const db = event.target.result;
+    db.createObjectStore('records', { autoIncrement: true });
+  };
+  request.onsuccess = function(event) {
+    resolve(event.target.result);
+  };
+  request.onerror = reject;
+});
+
+var db$1 = {
+  async getStore() {
+    return (await db).transaction(['records'], 'readwrite').objectStore('records')
+  }
+};
 
 // Querying data should follow this general schema:
 // 1. Build a subscription identifier from model name and query parameters
@@ -6,15 +26,15 @@ import db from './db.mjs'
 // 3. If we do, return the existing entries from indexeddb
 // 4. If we don't, create a new subscription and return the first batch
 
-export default class {
+class model {
   // Returns a new model class with the purpose of being augmented by Opal/Ruby2JS/etc
   static make(modelName) {
     return class extends this {
       static name = modelName
       constructor(attrs) {
-        super()
-        this._subscribers = []
-        this.attrs = attrs
+        super();
+        this._subscribers = [];
+        this.attrs = attrs;
       }
     }
   }
@@ -35,8 +55,8 @@ export default class {
 
 
   async save() {
-    const objectStore = await db.getStore()
-    objectStore.add({model: this.constructor.name, attrs: this.attrs})
+    const objectStore = await db$1.getStore();
+    objectStore.add({model: this.constructor.name, attrs: this.attrs});
   }
 
   async reload() {
@@ -44,7 +64,7 @@ export default class {
   }
 
   subscribe(callback) {
-    callback(this.attrs)
+    callback(this.attrs);
     this._subscribers.push(callback);
     return () => {
       // Unsubscribe
@@ -59,3 +79,5 @@ export default class {
   }
 
 }
+
+exports.Model = model;
