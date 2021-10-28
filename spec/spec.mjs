@@ -1,8 +1,17 @@
 import "../node_modules/fake-indexeddb/auto.js"
 
+import db from '../src/db.mjs'
+
+
+
 import Model from '../src/model.mjs'
 
 describe("The model base class", function() {
+
+  afterEach(async function() {
+    const store = await db.getStore()
+    await store.clear()
+  })
 
   it("can make subclasses", async function() {
     const User = Model.make("User")
