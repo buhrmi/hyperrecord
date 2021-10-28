@@ -7,10 +7,10 @@ Framework-agnostic client-side adapter for [HyperModel](https://docs.hyperstack.
 ## Usage
 
 ```js
-import { Model } from 'hyperrecord'
+import Hyperrecord from 'hyperrecord'
 
 // Create a model
-const User = Model.make('User')
+const User = Hyperrecord.model('User')
 
 // Create a record with a `name` attribute
 const user = await User.create({name: 'John Doe'})
