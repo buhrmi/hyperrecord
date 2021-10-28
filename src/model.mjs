@@ -21,6 +21,17 @@ export default class {
 
   static async find() {
     // TODO
+    return new this({});
+  }
+  
+  static async last() {
+    // TODO
+    return new this({});
+  }
+
+  static async first() {
+    // TODO
+    return new this({});
   }
 
   static where() {
