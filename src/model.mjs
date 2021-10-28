@@ -25,13 +25,35 @@ export default class {
   }
   
   static async last() {
-    // TODO
-    return new this({});
+    const store = await db.getReadonlyStore()
+    const model = this
+    return new Promise(function(resolve) {
+      const request = store.index('model').openCursor(null, 'prev')
+      request.onsuccess = (event) => {
+        const cursor = event.target.result
+        if (cursor) {
+          resolve(new model(cursor.value.attrs))
+        } else {
+          resolve(null)
+        }
+      }
+    })
   }
 
   static async first() {
-    // TODO
-    return new this({});
+    const store = await db.getReadonlyStore()
+    const model = this
+    return new Promise(function(resolve) {
+      const request = store.index('model').openCursor(null, 'next')
+      request.onsuccess = (event) => {
+        const cursor = event.target.result
+        if (cursor) {
+          resolve(new model(cursor.value.attrs))
+        } else {
+          resolve(null)
+        }
+      }
+    })
   }
 
   static where() {

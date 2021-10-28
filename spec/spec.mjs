@@ -29,10 +29,20 @@ describe("A record", function() {
 
   it("can find last record", async function() {
     const User = Model.make("User")
-    const user = await User.create({ name: "Jamaican Doe" })
-    await user.save()
+    await User.create({ name: "first" })
+    await User.create({ name: "second" })
+    await User.create({ name: "last" })  
     const lastUser = await User.last()
-    expect(lastUser.attrs.name).toEqual("Jamaican Doe")
+    expect(lastUser.attrs.name).toEqual("last")
+  })
+
+  it("can find first record", async function() {
+    const User = Model.make("User")
+    await User.create({ name: "first" })
+    await User.create({ name: "second" })
+    await User.create({ name: "last" })
+    const firstUser = await User.first()
+    expect(firstUser.attrs.name).toEqual("first")
   })
 
   it("triggers subscriptions when set is called", async function() {
