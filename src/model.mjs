@@ -5,6 +5,45 @@ import db from './db.mjs'
 // 2. See if we already have a subscription for this identifier
 // 3. If we do, return the existing entries from indexeddb
 // 4. If we don't, create a new subscription and return the first batch
+class Query {
+  constructor (model, params) {
+    this.model = model
+    this.params = params
+    this.order = 'asc'
+  }
+  
+  async last() {
+    if (this.order == 'desc') this.order = 'asc'
+    else this.order = 'desc'
+    return this.first()
+  }
+
+  async first() {
+    const request = await this.buildRequest()
+    return new Promise((resolve) => {
+      request.onsuccess = (event) => {
+        const cursor = event.target.result
+        if (cursor) {
+          resolve(new this.model(cursor.value.attrs))
+        } else {
+          resolve(null)
+        }
+      }
+    })
+  }
+
+  async buildRequest() {
+    const store = await db.getReadonlyStore()
+    const index = store.index('model')
+    let request
+    if (this.order === 'asc') {
+      request = index.openCursor(null, 'next')
+    } else {
+      request = index.openCursor(null, 'prev')
+    }
+    return request
+  }
+}
 
 export default class {
   // Returns a new model class with the purpose of being augmented by Opal/Ruby2JS/etc
@@ -25,39 +64,15 @@ export default class {
   }
   
   static async last() {
-    const store = await db.getReadonlyStore()
-    const model = this
-    return new Promise(function(resolve) {
-      const request = store.index('model').openCursor(null, 'prev')
-      request.onsuccess = (event) => {
-        const cursor = event.target.result
-        if (cursor) {
-          resolve(new model(cursor.value.attrs))
-        } else {
-          resolve(null)
-        }
-      }
-    })
+    return await new Query(this).last();
   }
 
   static async first() {
-    const store = await db.getReadonlyStore()
-    const model = this
-    return new Promise(function(resolve) {
-      const request = store.index('model').openCursor(null, 'next')
-      request.onsuccess = (event) => {
-        const cursor = event.target.result
-        if (cursor) {
-          resolve(new model(cursor.value.attrs))
-        } else {
-          resolve(null)
-        }
-      }
-    })
+    return await new Query(this).first();
   }
 
-  static where() {
-    // TODO
+  static where(params) {
+    return new Query(this, params);
   }
   
   static async create(attrs) {
@@ -70,6 +85,7 @@ export default class {
   async save() {
     const objectStore = await db.getStore()
     objectStore.add({model: this.constructor.name, attrs: this.attrs})
+    // TODO: save remotely
   }
 
   async reload() {

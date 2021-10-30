@@ -6,12 +6,14 @@ import db from '../src/db.mjs'
 
 import Hyperrecord from '../src/model.mjs'
 
+async function clearStore() {
+  const store = await db.getStore()
+  await store.clear()
+}
+
 describe("The model base class", function() {
 
-  afterEach(async function() {
-    const store = await db.getStore()
-    await store.clear()
-  })
+  afterEach(clearStore)
 
   it("can make subclasses", async function() {
     const User = Hyperrecord.model("User")
@@ -23,6 +25,7 @@ describe("The model base class", function() {
     expect(user.attrs.name).toEqual("John Doe")
     expect(user.subscribe).toBeInstanceOf(Function);
     expect(user.set).toBeInstanceOf(Function);
+    await clearStore() // afterEach(clearStore) doesn't work
   });
 
 });
@@ -34,6 +37,7 @@ describe("A record", function() {
     const spy = jasmine.createSpy('subscription')
     user.subscribe(spy)
     expect(spy).toHaveBeenCalledWith({ name: "John Doe" })
+    await clearStore() // afterEach(clearStore) doesn't work
   })
 
   it("can find last record", async function() {
@@ -43,6 +47,17 @@ describe("A record", function() {
     await User.create({ name: "last" })  
     const lastUser = await User.last()
     expect(lastUser.attrs.name).toEqual("last")
+    await clearStore() // afterEach(clearStore) doesn't work
+  })
+
+  it("can find itself", async function() {
+    const User = Hyperrecord.model("User")
+    const user1 = await User.create({ name: "first" })
+    const user2 = await User.create({ name: "second" })
+    const user3 = await User.create({ name: "last" })  
+    const foundUser = await User.where({ name: "second" }).first()
+    expect(foundUser.attrs.name).toEqual("second")
+    await clearStore() // afterEach(clearStore) doesn't work
   })
 
   it("can find first record", async function() {
@@ -52,6 +67,7 @@ describe("A record", function() {
     await User.create({ name: "last" })
     const firstUser = await User.first()
     expect(firstUser.attrs.name).toEqual("first")
+    await clearStore() // afterEach(clearStore) doesn't work
   })
 
   it("triggers subscriptions when set is called", async function() {
@@ -63,6 +79,7 @@ describe("A record", function() {
 
     user.set({ name: "Jane Doe" })
     expect(spy).toHaveBeenCalledWith({ name: "Jane Doe" })
+    await clearStore() // afterEach(clearStore) doesn't work
   })
 
   it("can be unsubscribed from", async function() {
@@ -74,5 +91,6 @@ describe("A record", function() {
     unsubscribe()
     user.set({ name: "Jane Doe" })
     expect(spy).toHaveBeenCalledWith({ name: "John Doe" })
+    await clearStore() // afterEach(clearStore) doesn't work
   })
 })
